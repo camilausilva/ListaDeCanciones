@@ -6,15 +6,29 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+    <!--BOOTSTRAP-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="/tpfinal/assets/css/style.css" rel="stylesheet" type="text/css">
+
+    <!--CSS-->
+    <link href="/ListaDeCanciones/assets/css/style.css" rel="stylesheet" type="text/css">
+
+    <!--GOOGLE FONTS-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet"> 
+
+
+
 </head>
 
 <body>
 
     <div class="shadow-lg p-3 mb-5" id="header">
-        <h1>MI LISTA DE CANCIONES</h1>
+        <h2>
+            MI LISTA
+        </h2>
     </div>
 
     <table class="table table-dark" id="tabla">

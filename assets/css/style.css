@@ -2,13 +2,16 @@
     --mainColor: #000;
     --objectColor: #212529;
     --textColor: white;
+    --borderColor: #000
 }
 
-#header {
-    background-color: var(--objectColor);
-    /* box-shadow: 4px 0px 20px var(--mainColor); */
-    text-align: center;
-    padding: 1%;
+/*---------------------------------------------*/
+/*                  GENERAL                    */
+/*---------------------------------------------*/
+
+h2 {
+    color: var(--textColor);
+    font-family: 'Alfa Slab One', cursive;
 }
 
 body {
@@ -19,9 +22,16 @@ body {
     background-attachment: fixed;
 }
 
-h1 {
-    color: var(--textColor);
-    font-family: Arial, Helvetica, sans-serif;
+/*---------------------------------------------*/
+/*                   INDEX                     */
+/*---------------------------------------------*/
+
+#header {
+    background-color: var(--objectColor);
+    /* box-shadow: 4px 0px 20px var(--mainColor); */
+    text-align: center;
+    height: 8%;
+    border-bottom: var(--borderColor);
 }
 
 .table {
@@ -29,4 +39,5 @@ h1 {
     margin: auto;
     padding-top: 20%;
     box-shadow: 0px 0px 20px 4px var(--mainColor);
+    border-color: var(--borderColor);
 }
