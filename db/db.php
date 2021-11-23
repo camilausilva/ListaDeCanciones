@@ -1,3 +1,3 @@
 <?php
-  require_once "db/crud.php";
+  include "db/crud.php";
 ?>
