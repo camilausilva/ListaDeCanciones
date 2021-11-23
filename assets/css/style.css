@@ -16,7 +16,7 @@ h2 {
 body {
     /* background-color: var(--mainColor); */
     background: url('../img/pexels-koolshooters-6621701.jpg') var(--mainColor);
-    height: 1000px;
+    height: 100%;
     width: 100%;
     background-size: cover;
     background-attachment: fixed;

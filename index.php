@@ -52,6 +52,7 @@
     </div>
 
     <div id="container">
+
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +61,13 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item dropdown">
+
+                                <!-- <select class="form-select" aria-label="Default select example">
+                                <option selected>Open this select menu</option>
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                                </select> -->
 
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Filtrar por
@@ -126,6 +134,7 @@
             </thead>
 
             <tbody>
+
                 <?php foreach($canciones as $cancion): 
                     $artistas_canciones = $pdo->query("SELECT * FROM artistas_canciones WHERE idCanciones = " . $cancion['idCanciones']);
                     $albumes = $pdo->query("SELECT * FROM canciones_albumes WHERE idCanciones = " . $cancion['idCanciones']);
@@ -301,8 +310,19 @@
                 <?php endforeach;?>
                 
             </tbody>
-
+            
         </table>
+
+            <!-- <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-left">
+                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                </ul>
+            </nav> -->
+
     </div>
 
     <!-- ADD MODAL -->
@@ -324,7 +344,26 @@
                         <input type="text" class="form-control" id="inputTitulo">
 
                         <label for="inputArtista" class="col-form-label">Artista(s):</label>
-                        <textarea class="form-control" id="inputArtista"></textarea>
+                        <select class="form-select" aria-label="Default select example" id="inputArtista">
+                            
+                            <option selected>Artista(s)</option>
+
+                            <?php 
+
+                            $artistasActuales = getAll("artistas");
+
+                            foreach($artistasActuales as $artistaActual): ?>
+
+                                <option value="<?php echo $artistaActual["idArtistas"] ?>">
+                                    <?php echo $artistaActual["nombre"] ?>
+                                </option>
+
+                            <?php
+                            endforeach;
+                            ?>
+                            
+                        </select>
+
 
                         <label for="inputDuracion" class="col-form-label">Duración:</label>
                         <input type="text" class="form-control" id="inputDuracion">
@@ -339,10 +378,19 @@
                         <input type="text" class="form-control" id="inputAnio">
 
                         <label for="inputGenero" class="col-form-label">Género:</label>
-                        <input type="text" class="form-control" id="inputGenero">
+                        <select class="form-select" aria-label="Default select example" id="inputGenero">
+                            <option selected>Seleccionar Género</option>
+                            <option value="1">Death Metal Melódico Progresivo</option>
+                            <option value="2">Funk Rock</option>
+                            <option value="3">Groove Metal</option>
+                            <option value="4">Hardcore Melódico</option>
+                            <option value="5">Grunge</option>
+                            <option value="6">Rock Alternativo</option>
+                            <option value="7">Indie Rock</option>
+                            <option value="8">Hardcore Melódico</option>
+                        </select>
+                
 
-                        <label for="inputPais" class="col-form-label">País:</label>
-                        <input type="text" class="form-control" id="inputPais">
 
                         <label for="inputCover" class="col-form-label">¿Es un Cover?</label>
                         &nbsp;

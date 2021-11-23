@@ -1,10 +1,10 @@
 <?php 
   include "db/connection.php";
 
-  function getAll($tabla, $order = false, $orderBy = "")
+  function getAll($tabla, $order = false, $orderBy = "") 
   {
     $pdo = connect();
-    try
+    try 
     {
       if($order)
       {
@@ -72,8 +72,22 @@
       echo $e->getMessage();
     }
   }
-  
+
+  function insertOrUpdate($tabla,$id) {
+
+      $pdo = connect();
+      try
+      {
+        $stm = $pdo->prepare("DELETE FROM {$tabla} WHERE idCanciones=?");
+        $stm->execute([$id]);
+        return $stm->fetch();
+      }
+      catch(PDOException $e)
+      {
+        echo $e->getMessage();
+      }
+
+  }
+
 ?>
-
-
 
