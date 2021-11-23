@@ -1,7 +1,8 @@
 <?php 
-	require_once "db/crud.php";
+	include "db/crud.php";
+    $pdo = connect();
 	
-	$canciones = getAll('canciones', true, "idCanciones");
+	$canciones = getAll('canciones');
 ?>
 
 <!DOCTYPE html>
@@ -26,9 +27,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet"> 
 
-    <!--FONT AWESOME-->
-    <script src="https://kit.fontawesome.com/5f64a46e85.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="/ListaDeCanciones/assets/css/font-awesome-animation.css">
+
 
 </head>
 
@@ -53,13 +52,8 @@
                                     Filtrar por
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-<<<<<<< Updated upstream
                                     <li><a class="dropdown-item" href="#">Nombre</a></li>
                                     <li><a class="dropdown-item" href="#">Artista(s)</a></li>
-=======
-                                    <li><a class="dropdown-item" href="#">Título</a></li>
-                                    <li><a class="dropdown-item" href="#">Artista/s</a></li>
->>>>>>> Stashed changes
                                     <li><a class="dropdown-item" href="#">Duración</a></li>
                                     <li><a class="dropdown-item" href="#">Colaboradores</a></li>
                                     <li><a class="dropdown-item" href="#">Álbum</a></li>
@@ -71,31 +65,18 @@
                                 </ul>
                             </li>
                         </ul>
-
                         <form class="d-flex">
                             <input class="form-control me-2" type="search" placeholder="Ingrese un dato" aria-label="Search">
                             <button class="btn btn-outline-light" type="submit">Buscar</button>
                         </form>
-                        
-                        &nbsp;
-                        &nbsp;
-
-                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
-                            <i class="fa fa-plus"></i>
-                        </button>
-
-                        <!-- <a href="#addEmployeeModal" class="btn btn-light add-new" data-toggle="modal"></a> -->
-                        <!-- <button type="button" class="btn btn-light add-new">/button> -->
-
                     </div>
             </div>
         </nav>
 
-        <table class="table table-dark table-hover table align-middle" id="table">
+        <table class="table table-dark" id="table">
 
             <thead>
                 <tr>
-<<<<<<< Updated upstream
                     <th>Nombre</th>
                     <th>Artista(s)</th>
                     <th>Duración</th>
@@ -106,39 +87,38 @@
                     <th>País</th>
                     <th>Fecha</th>
                     <th>¿Es un cover?</th>
-=======
-                    <th>Título <i class="fa fa-sort"></i></th>
-                    <th>Artista/s <i class="fa fa-sort"></i></th>
-                    <th>Duración <i class="fa fa-sort"></i></th>
-                    <th>Álbum <i class="fa fa-sort"></i></th>
-                    <th>Track</th>
-                    <th>País <i class="fa fa-sort"></i></th>
-                    <th>Fecha de Salida <i class="fa fa-sort"></i></th>
-                    <th>¿Es un Cover?</th>
-                    <th>Acciones</th>
->>>>>>> Stashed changes
                 </tr>
             </thead>
 
             <tbody>
-<<<<<<< Updated upstream
-                <?php foreach($canciones as $cancion): ?>
+                <?php foreach($canciones as $cancion): 
+                    $artistas_canciones = $pdo->query("SELECT * FROM artistas_canciones WHERE idCanciones = " . $cancion['idCanciones']);
+                    
+                    ?> 
                     <tr>
                         <td><?php echo $cancion['titulo']; ?></td>
-                        <td><?php echo $cancion['idArtistas']; ?></td> <!-- debería aparecer el nombre acá-->
+                        <td><?php 
+                                $artistas = getAll("artistas INNER JOIN artistas_canciones ON artistas_canciones.idArtistas = artistas.idArtistas WHERE " . $cancion['idCanciones']);
+                                echo $artistas[0]['nombre'] 
+                            ?></td>
                         <td><?php echo $cancion['duracion']; ?></td>
                         <td>
-                            <?php if($cancion['colaboradores'] == ""){
+                            <?php 
+                                if(count($artistas) > 1){
+                                    $colab = "";
+                                    for($i = 1; $i < count($artistas); $i++){
+                                        $colab .= $artistas[$i]['nombre'] . " / ";
+                                    }
+                                    echo substr($colab, 0, -3);
+                                } else{
                                     echo '-';
-                                  } else {
-                                      echo $cancion['colaboradores'];
-                                  }        
+                                }
                             ?>
                         </td>
                         <td>ALBUM</td>
                         <td><?php echo $cancion['genero']; ?></td>
                         <td>PISTA</td>
-                        <td>NACIONALIDAD</td>
+                        <td><?php echo $artistas[0]['nacionalidad']  ?></td>
                         <td>FECHA</td>
                         <td>
                             <?php 
@@ -175,133 +155,12 @@
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
-=======
-
-                <tr>
-
-                    <!-- TÍTULO -->
-                    <td>
-                        Bohemian Rhapsody
-                    </td>
-                    
-                    <!-- ARTISTA/S -->
-                    <td>
-                        Queen
-                    </td>
-
-                    <!-- DURACIÓN -->
-                    <td>
-                        3:45
-                    </td>
-
-                    <!-- ÁLBUM -->
-                    <td>
-                        A Night At The Opera
-                    </td>
-
-                    <!-- Nº TRACK -->
-                    <td>
-                        11
-                    </td>
-
-                    <!-- PAÍS -->
-                    <td>
-                        -
-                    </td>
-
-                    <!-- FECHA DE SALIDA -->
-                    <td>
-                        -
-                    </td>
-                    
-                    <!-- ¿ES UN COVER? -->
-                    <td>
-                        <span class="custom-checkbox">
-                            <input type="checkbox" id="checkbox1" name="options[]" value="1">
-                            <label for="checkbox1"></label>
-                        </span>
-                    </td>
-
-                    <!-- ACCIONES -->
-                    <td>
-
-                        <!-- <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="" data-original-title="Edit"></i>
-                            <i class="material-icons" data-toggle="tooltip" title="" data-original-title="Edit"></i>
-                        </a> -->
-
-                        <!-- EDIT -->
-                        <a class="btn btn-light">
-                            <i class="far fa-edit" id="icon"></i>                            
-                        </a>
-
-                        <!-- DELETE -->
-                        <a href="#deleteEmployeeModal" data-toggle="modal" class="btn btn-light">
-                            <i class="far fa-trash-alt" id="icon"></i>    
-                        </a>
-                        
-
-                    </td>
-
->>>>>>> Stashed changes
                 </tr>
-
+                
             </tbody>
 
         </table>
-
-    </div>
-
-    <!-- ADD MODAL -->
-    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-
-                <!-- Cabeza del Modal -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addModalLabel">AGREGAR UNA CANCIÓN</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <!-- Cuerpo del Modal -->
-                <div class="modal-body">
-
-                    <label for="titulo" class="col-form-label">Título:</label>
-                    <input type="text" class="form-control" id="titulo">
-
-                    <label for="artista" class="col-form-label">Artista/s:</label>
-                    <input type="text" class="form-control" id="artista">
-
-                    <label for="duracion" class="col-form-label">Duración:</label>
-                    <input type="text" class="form-control" id="duracion">
-
-                    <label for="album" class="col-form-label">Álbum:</label>
-                    <input type="text" class="form-control" id="album">
-
-                    <label for="track" class="col-form-label">Track:</label>
-                    <input type="text" class="form-control" id="track">
-
-                    <label for="pais" class="col-form-label">País:</label>
-                    <input type="text" class="form-control" id="pais">
-
-                    <label for="fechasalida" class="col-form-label">Fecha de Salida:</label>
-                    <input data-provide="datepicker">
-                    <input type="text" class="form-control" id="fechasalida">
-
-                    <label for="cover" class="col-form-label">¿Es un Cover?</label>
-                    <input type="text" class="form-control" id="cover">
-
-                </div>
-
-                <!-- Pie del Modal -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
-                </div>
-
-            </div>
-        </div>
     </div>
 
 </body>
-
 </html>
