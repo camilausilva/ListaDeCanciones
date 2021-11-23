@@ -12,8 +12,8 @@
     
     $host = "localhost";      // Poner el hostname de phpmyadmin del servidor de mysql
     $dbName = "grupo3_2021";  // Nombre de la base de datos
-    $usuario = "dbadmin";     // Nombre de usuario
-    $pass = ".admindb";       // Contrasena
+    $usuario = "root";     // Nombre de usuario
+    $pass = "";       // Contrasena
     
     try 
     {

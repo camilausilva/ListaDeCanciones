@@ -27,7 +27,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet"> 
 
-
+    <!--FONT AWESOME-->
+    <script src="https://kit.fontawesome.com/5f64a46e85.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/ListaDeCanciones/assets/css/font-awesome-animation.css">
 
 </head>
 
@@ -52,7 +54,7 @@
                                     Filtrar por
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" href="#">Nombre</a></li>
+                                    <li><a class="dropdown-item" href="#">Título</a></li>
                                     <li><a class="dropdown-item" href="#">Artista(s)</a></li>
                                     <li><a class="dropdown-item" href="#">Duración</a></li>
                                     <li><a class="dropdown-item" href="#">Colaboradores</a></li>
@@ -69,11 +71,19 @@
                             <input class="form-control me-2" type="search" placeholder="Ingrese un dato" aria-label="Search">
                             <button class="btn btn-outline-light" type="submit">Buscar</button>
                         </form>
+
+                        &nbsp;
+                        &nbsp;
+
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
+                            <i class="fa fa-plus"></i>
+                        </button>
+
                     </div>
             </div>
         </nav>
 
-        <table class="table table-dark" id="table">
+        <table class="table table-dark table align-middle" id="table">
 
             <thead>
                 <tr>
@@ -87,6 +97,7 @@
                     <th>País</th>
                     <th>¿Es un cover?</th>
                     <th>Usuario</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
 
@@ -96,24 +107,39 @@
                     $albumes = $pdo->query("SELECT * FROM canciones_albumes WHERE idCanciones = " . $cancion['idCanciones']);
 
                     ?> 
+
                     <tr>
-                        <td><?php echo $cancion['titulo']; ?></td>
+
+                        <!-- TITULO -->
+                        <td>
+                            <?php echo $cancion['titulo']; ?>
+                        </td>
+
+                        <!-- ARTISTAS -->
                         <td>
                             <?php 
                                 $artistas = getAll("artistas INNER JOIN artistas_canciones ON artistas_canciones.idArtistas = artistas.idArtistas WHERE artistas_canciones.idCanciones = " . $cancion['idCanciones']);
-                                echo $artistas[0]['nombre'];
-
-                                if(count($artistas) > 1){
-                                    echo ' ft. ';
-                                    $colab = "";
-                                    for($i = 1; $i < count($artistas); $i++){
-                                        $colab .= $artistas[1]['nombre'] . " / ";
+                                
+                                if(count($artistas) > 0) {
+                                  echo $artistas[0]['nombre'];   
+                                    if(count($artistas) > 1){
+                                        echo ' ft. ';
+                                        $colab = "";
+                                        for($i = 1; $i < count($artistas); $i++){
+                                            $colab .= $artistas[1]['nombre'] . " / ";
+                                        }
+                                        echo substr($colab, 0, -3);
                                     }
-                                    echo substr($colab, 0, -3);
                                 }
                             ?>
                         </td>
-                        <td><?php echo $cancion['duracion']; ?></td>
+
+                        <!-- DURACION -->
+                        <td>
+                            <?php echo $cancion['duracion']; ?>
+                        </td>
+
+                        <!-- ALBUM -->
                         <td>
                             <?php 
                                 $albumes = getAll("albumes INNER JOIN canciones_albumes ON canciones_albumes.idAlbumes = albumes.idAlbumes WHERE canciones_albumes.idCanciones = " . $cancion['idCanciones']);
@@ -124,6 +150,8 @@
                                 }
                             ?>
                         </td>
+
+                        <!-- PISTA -->
                         <td>
                             <?php  
                                 if(empty($albumes) || $albumes[0]['titulo'] == "") {
@@ -133,6 +161,8 @@
                                 }
                             ?>
                         </td>
+
+                        <!-- LANZAMIENTO -->
                         <td>
                             <?php
                                 if(empty($albumes) || $albumes[0]['lanzamiento'] == 0000) {
@@ -142,17 +172,38 @@
                                 }
                             ?>
                         </td>
-                        <td><?php echo $cancion['genero']; ?></td>
-                        <td><?php echo $artistas[0]['nacionalidad']  ?></td>
+
+                        <!-- GENERO -->
+                        <td>
+                            <?php echo $cancion['genero']; ?>
+                        </td>
+
+                        <!-- NACIONALIDAD -->
                         <td>
                             <?php 
-                                if($cancion['cover'] == 1){
-                                    echo 'Si' . ' (' . $cancion['artistaOriginal'] . ')';
-                                } else{
-                                    echo 'No';
+                                if(count($artistas) > 0) {
+                                    echo $artistas[0]['nacionalidad'];                          
                                 }
                             ?>
                         </td>
+
+                        <!-- COVER -->
+                        <td>
+                            <?php 
+                                if($cancion['cover'] == 1){ ?> 
+                                    <i class="fas fa-check"></i> 
+                                <?php    
+                                }
+                            ?>
+
+                        <!-- <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox1" name="options[]" value="1">
+                            <label for="checkbox1"></label>
+                        </span> -->
+
+                        </td>
+
+                        <!-- USUARIO -->
                         <td>
                             <?php
                                 $usuario = getAll("usuarios INNER JOIN canciones_usuarios ON canciones_usuarios.idUsuario = usuarios.idUsuario WHERE " . $cancion['idCanciones']);
@@ -163,6 +214,22 @@
                                 }
                             ?>
                         </td>
+
+                    <!-- ACCIONES -->
+                    <td>
+
+                        <!-- EDIT -->
+                        <a class="btn btn-light">
+                            <i class="far fa-edit" id="icon"></i>                            
+                        </a>
+                        
+                        <!-- DELETE -->
+                        <a href="#deleteModal" data-toggle="modal" class="btn btn-light">
+                            <i class="far fa-trash-alt" id="icon"></i>    
+                        </a>
+
+                    </td>
+
                     </tr>
                 <?php endforeach;?>
                 
