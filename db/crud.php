@@ -14,7 +14,7 @@
 
       }else
       {
-        $stm = $pdo->prepare("SELECT * FROM {$tabla} ");
+        $stm = $pdo->prepare("SELECT * FROM {$tabla}");
         $stm->execute();
       }
 
