@@ -1,3 +1,9 @@
+<?php 
+	require_once "crud.php";
+	
+	$canciones = getAll('canciones', true, "idCanciones");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -46,13 +52,14 @@
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="#">Nombre</a></li>
-                                    <li><a class="dropdown-item" href="#">Artista/s</a></li>
+                                    <li><a class="dropdown-item" href="#">Artista(s)</a></li>
                                     <li><a class="dropdown-item" href="#">Duración</a></li>
                                     <li><a class="dropdown-item" href="#">Colaboradores</a></li>
                                     <li><a class="dropdown-item" href="#">Álbum</a></li>
-                                    <li><a class="dropdown-item" href="#">Track</a></li>
+                                    <li><a class="dropdown-item" href="#">Género</a></li>
+                                    <li><a class="dropdown-item" href="#">Pista</a></li>
                                     <li><a class="dropdown-item" href="#">País</a></li>
-                                    <li><a class="dropdown-item" href="#">Fecha de Salida</a></li>
+                                    <li><a class="dropdown-item" href="#">Fecha</a></li>
                                     <li><a class="dropdown-item" href="#">Covers</a></li>
                                 </ul>
                             </li>
@@ -70,18 +77,34 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Artista/s</th>
+                    <th>Artista(s)</th>
                     <th>Duración</th>
                     <th>Colaboradores</th>
                     <th>Álbum</th>
-                    <th>Track</th>
+                    <th>Género</th>
+                    <th>Pista</th>
                     <th>País</th>
-                    <th>Fecha de Salida</th>
-                    <th>¿Es un Cover?</th>
+                    <th>Fecha</th>
+                    <th>¿Es un cover?</th>
                 </tr>
             </thead>
 
             <tbody>
+                <?php foreach($canciones as $cancion): ?>
+                    <tr>
+                        <td><?php echo $cancion['titulo']; ?></td>
+                        <td><?php echo $cancion['idArtistas']; ?></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                <?php endforeach;?>
+
                 <tr>
                     <td>Bohemian Rhapsody</td>
                     <td>Queen</td>
@@ -89,6 +112,7 @@
                     <td>Ninguno/a</td>
                     <td>A Night At The Opera</td>
                     <td>11</td>
+                    <td>-</td>
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
@@ -101,16 +125,6 @@
                     <td>A Night At The Opera</td>
                     <td>11</td>
                     <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>Bohemian Rhapsody</td>
-                    <td>Queen</td>
-                    <td>3:45</td>
-                    <td>Ninguno/a</td>
-                    <td>A Night At The Opera</td>
-                    <td>11</td>
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
