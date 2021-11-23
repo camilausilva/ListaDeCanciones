@@ -1,5 +1,5 @@
 <?php 
-	require_once "crud.php";
+	require_once "db/crud.php";
 	
 	$canciones = getAll('canciones', true, "idCanciones");
 ?>
@@ -93,15 +93,30 @@
                 <?php foreach($canciones as $cancion): ?>
                     <tr>
                         <td><?php echo $cancion['titulo']; ?></td>
-                        <td><?php echo $cancion['idArtistas']; ?></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
+                        <td><?php echo $cancion['idArtistas']; ?></td> <!-- debería aparecer el nombre acá-->
+                        <td><?php echo $cancion['duracion']; ?></td>
+                        <td>
+                            <?php if($cancion['colaboradores'] == ""){
+                                    echo '-';
+                                  } else {
+                                      echo $cancion['colaboradores'];
+                                  }        
+                            ?>
+                        </td>
+                        <td>ALBUM</td>
+                        <td><?php echo $cancion['genero']; ?></td>
+                        <td>PISTA</td>
+                        <td>NACIONALIDAD</td>
+                        <td>FECHA</td>
+                        <td>
+                            <?php 
+                                if($cancion['cover'] == 1){
+                                    echo 'Si' . ' (' . $cancion['artistaOriginal'] . ')';
+                                } else{
+                                    echo 'No';
+                                }
+                            ?>
+                        </td>
                     </tr>
                 <?php endforeach;?>
 
