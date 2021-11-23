@@ -35,7 +35,7 @@
 
     <div class="shadow-lg p-3 mb-5" id="header">
         <h2>
-            MI LISTA
+            LISTA DE CANCIONES
         </h2>
     </div>
 
@@ -77,49 +77,73 @@
 
             <thead>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Artista(s)</th>
+                    <th>Título</th>
+                    <th>Artista</th>
                     <th>Duración</th>
-                    <th>Colaboradores</th>
                     <th>Álbum</th>
-                    <th>Género</th>
                     <th>Pista</th>
+                    <th>Año</th>
+                    <th>Género</th>
                     <th>País</th>
-                    <th>Fecha</th>
                     <th>¿Es un cover?</th>
+                    <th>Usuario</th>
                 </tr>
             </thead>
 
             <tbody>
                 <?php foreach($canciones as $cancion): 
                     $artistas_canciones = $pdo->query("SELECT * FROM artistas_canciones WHERE idCanciones = " . $cancion['idCanciones']);
-                    
+                    $albumes = $pdo->query("SELECT * FROM canciones_albumes WHERE idCanciones = " . $cancion['idCanciones']);
+
                     ?> 
                     <tr>
                         <td><?php echo $cancion['titulo']; ?></td>
-                        <td><?php 
-                                $artistas = getAll("artistas INNER JOIN artistas_canciones ON artistas_canciones.idArtistas = artistas.idArtistas WHERE " . $cancion['idCanciones']);
-                                echo $artistas[0]['nombre'] 
-                            ?></td>
-                        <td><?php echo $cancion['duracion']; ?></td>
                         <td>
                             <?php 
+                                $artistas = getAll("artistas INNER JOIN artistas_canciones ON artistas_canciones.idArtistas = artistas.idArtistas WHERE artistas_canciones.idCanciones = " . $cancion['idCanciones']);
+                                echo $artistas[0]['nombre'];
+
                                 if(count($artistas) > 1){
+                                    echo ' ft. ';
                                     $colab = "";
                                     for($i = 1; $i < count($artistas); $i++){
-                                        $colab .= $artistas[$i]['nombre'] . " / ";
+                                        $colab .= $artistas[1]['nombre'] . " / ";
                                     }
                                     echo substr($colab, 0, -3);
-                                } else{
-                                    echo '-';
                                 }
                             ?>
                         </td>
-                        <td>ALBUM</td>
+                        <td><?php echo $cancion['duracion']; ?></td>
+                        <td>
+                            <?php 
+                                $albumes = getAll("albumes INNER JOIN canciones_albumes ON canciones_albumes.idAlbumes = albumes.idAlbumes WHERE canciones_albumes.idCanciones = " . $cancion['idCanciones']);
+                                if(empty($albumes) || $albumes[0]['titulo'] == "") {
+                                    echo "-";
+                                } else {
+                                    echo $albumes[0]['titulo'];
+                                }
+                            ?>
+                        </td>
+                        <td>
+                            <?php  
+                                if(empty($albumes) || $albumes[0]['titulo'] == "") {
+                                    echo "-";
+                                } else {
+                                    echo $albumes[0]['pista'];
+                                }
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                                if(empty($albumes) || $albumes[0]['lanzamiento'] == 0000) {
+                                    echo "-";
+                                } else {
+                                    echo $albumes[0]['lanzamiento'];
+                                }
+                            ?>
+                        </td>
                         <td><?php echo $cancion['genero']; ?></td>
-                        <td>PISTA</td>
                         <td><?php echo $artistas[0]['nacionalidad']  ?></td>
-                        <td>FECHA</td>
                         <td>
                             <?php 
                                 if($cancion['cover'] == 1){
@@ -129,33 +153,18 @@
                                 }
                             ?>
                         </td>
+                        <td>
+                            <?php
+                                $usuario = getAll("usuarios INNER JOIN canciones_usuarios ON canciones_usuarios.idUsuario = usuarios.idUsuario WHERE " . $cancion['idCanciones']);
+                                if(empty($usuario)) {
+                                    echo "?";
+                                } else {
+                                    echo $usuario[0]['user'];
+                                }
+                            ?>
+                        </td>
                     </tr>
                 <?php endforeach;?>
-
-                <tr>
-                    <td>Bohemian Rhapsody</td>
-                    <td>Queen</td>
-                    <td>3:45</td>
-                    <td>Ninguno/a</td>
-                    <td>A Night At The Opera</td>
-                    <td>11</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>Bohemian Rhapsody</td>
-                    <td>Queen</td>
-                    <td>3:45</td>
-                    <td>Ninguno/a</td>
-                    <td>A Night At The Opera</td>
-                    <td>11</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
                 
             </tbody>
 
