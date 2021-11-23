@@ -1,8 +1,18 @@
 <?php 
+    $borrar = "";
+
 	include "db/crud.php";
     $pdo = connect();
-	
+
+    if(isset($_POST["delete"])) {
+        $borrar = delete('artistas_canciones', $_POST["delete"]);
+        $borrar .= delete('canciones_albumes', $_POST["delete"]);
+        $borrar .= delete('canciones_usuarios', $_POST["delete"]);
+        $borrar .= delete('canciones', $_POST["delete"]);
+    }
+
 	$canciones = getAll('canciones');
+
 ?>
 
 <!DOCTYPE html>
@@ -50,9 +60,11 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item dropdown">
+
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Filtrar por
                                 </a>
+
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="#">Título</a></li>
                                     <li><a class="dropdown-item" href="#">Artista(s)</a></li>
@@ -64,8 +76,19 @@
                                     <li><a class="dropdown-item" href="#">País</a></li>
                                     <li><a class="dropdown-item" href="#">Fecha</a></li>
                                     <li><a class="dropdown-item" href="#">Covers</a></li>
+                                    <!-- <li><a class="dropdown-item" href="#">Favorito</a></li> -->
                                 </ul>
+
+
                             </li>
+
+                            &nbsp;
+                            &nbsp;
+
+                            <a type="button" class="btn btn-outline-light btn-sm" href="index.php">
+                                Restaurar
+                            </a>
+
                         </ul>
                         <form class="d-flex">
                             <input class="form-control me-2" type="search" placeholder="Ingrese un dato" aria-label="Search">
@@ -96,6 +119,7 @@
                     <th>Género</th>
                     <th>País</th>
                     <th>¿Es un cover?</th>
+                    <!-- <th>Favorito</th> -->
                     <th>Usuario</th>
                     <th>Acciones</th>
                 </tr>
@@ -142,7 +166,9 @@
                         <!-- ALBUM -->
                         <td>
                             <?php 
-                                $albumes = getAll("albumes INNER JOIN canciones_albumes ON canciones_albumes.idAlbumes = albumes.idAlbumes WHERE canciones_albumes.idCanciones = " . $cancion['idCanciones']);
+                                $albumes = getAll("albumes 
+                                                INNER JOIN canciones_albumes ON canciones_albumes.idAlbumes = albumes.idAlbumes 
+                                                WHERE canciones_albumes.idCanciones = " . $cancion['idCanciones']);
                                 if(empty($albumes) || $albumes[0]['titulo'] == "") {
                                     echo "-";
                                 } else {
@@ -188,25 +214,24 @@
                         </td>
 
                         <!-- COVER -->
-                        <td>
+                        <td align="center">
                             <?php 
-                                if($cancion['cover'] == 1){ ?> 
+                                if($cancion['cover']){ ?> 
                                     <i class="fas fa-check"></i> 
                                 <?php    
                                 }
                             ?>
-
-                        <!-- <span class="custom-checkbox">
-                            <input type="checkbox" id="checkbox1" name="options[]" value="1">
-                            <label for="checkbox1"></label>
-                        </span> -->
-
                         </td>
+
+                        <!-- FAVORITO -->
+
 
                         <!-- USUARIO -->
                         <td>
                             <?php
-                                $usuario = getAll("usuarios INNER JOIN canciones_usuarios ON canciones_usuarios.idUsuario = usuarios.idUsuario WHERE " . $cancion['idCanciones']);
+                                $usuario = getAll("usuarios 
+                                                INNER JOIN canciones_usuarios ON canciones_usuarios.idUsuario = usuarios.idUsuario 
+                                                WHERE canciones_usuarios.idCanciones = " . $cancion['idCanciones']);
                                 if(empty($usuario)) {
                                     echo "?";
                                 } else {
@@ -219,18 +244,60 @@
                     <td>
 
                         <!-- EDIT -->
-                        <a class="btn btn-light">
-                            <i class="far fa-edit" id="icon"></i>                            
-                        </a>
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
+                            <i class="far fa-edit" id="icon"></i> 
+                        </button>
                         
                         <!-- DELETE -->
-                        <a href="#deleteModal" data-toggle="modal" class="btn btn-light">
-                            <i class="far fa-trash-alt" id="icon"></i>    
-                        </a>
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $cancion['idCanciones'] ?>">
+                            <i class="far fa-trash-alt" id="icon"></i> 
+                        </button>
 
                     </td>
 
                     </tr>
+
+                        <!-- DELETE MODAL -->
+
+                        <div class="modal fade" id="deleteModal<?php echo $cancion['idCanciones'] ?>" aria-hidden="true" aria-labelledby="deleteModalLabel<?php echo $cancion['idCanciones'] ?>" tabindex="-1">
+                        
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel<?php echo $cancion['idCanciones'] ?>">BORRAR UNA CANCIÓN</h5>
+                                        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                                    </div>
+
+                                    <div class="modal-body">
+                                        ¿Realmente desea ELIMINAR "<?php echo $cancion['titulo'] ?>"?
+                                    </div>
+
+                                    <div class="modal-footer">
+
+                                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
+                                            No, me arrepiento
+                                        </button>
+
+
+                                        <form action="#" method="POST">
+                                            <button class="btn btn-primary" data-bs-toggle="modal" value="<?php echo $cancion['idCanciones'] ?>" name="delete"> 
+                                                Sí, deseo eliminarla
+                                            </button>                                            
+                                        </form>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <!-- BORRADO -->
+
+
+
                 <?php endforeach;?>
                 
             </tbody>
@@ -238,5 +305,90 @@
         </table>
     </div>
 
+    <!-- ADD MODAL -->
+
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">ACTUALIZAR DATOS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+                    <div class="mb-3">
+
+                        <label for="inputTitulo" class="col-form-label">Título:</label>
+                        <input type="text" class="form-control" id="inputTitulo">
+
+                        <label for="inputArtista" class="col-form-label">Artista(s):</label>
+                        <textarea class="form-control" id="inputArtista"></textarea>
+
+                        <label for="inputDuracion" class="col-form-label">Duración:</label>
+                        <input type="text" class="form-control" id="inputDuracion">
+
+                        <label for="inputAlbum" class="col-form-label">Álbum:</label>
+                        <textarea class="form-control" id="inputAlbum"></textarea>
+
+                        <label for="inputPista" class="col-form-label">Pista:</label>
+                        <input type="text" class="form-control" id="inputPista">
+
+                        <label for="inputAnio" class="col-form-label">Año:</label>
+                        <input type="text" class="form-control" id="inputAnio">
+
+                        <label for="inputGenero" class="col-form-label">Género:</label>
+                        <input type="text" class="form-control" id="inputGenero">
+
+                        <label for="inputPais" class="col-form-label">País:</label>
+                        <input type="text" class="form-control" id="inputPais">
+
+                        <label for="inputCover" class="col-form-label">¿Es un Cover?</label>
+                        &nbsp;
+                        &nbsp;
+                        <span class="custom-checkbox">
+                            <input type="checkbox" id="inputCover" name="options[]" value="1">
+                            <label for="inputCover"></label>
+                        </span>
+
+                    </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addModal2" aria-hidden="true" aria-labelledby="addModalLabel2" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel2">CANCIÓN ELIMINADA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                Se ha ACTUALIZADO la Lista de Canciones
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
 </body>
+
 </html>

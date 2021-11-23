@@ -41,12 +41,12 @@
     }
   }
 
-  function delete($tabla,$id)
+  function delete($tabla,$id) 
   {
     $pdo = connect();
     try
     {
-      $stm = $pdo->prepare("DELETE FROM {$tabla} WHERE id=?");
+      $stm = $pdo->prepare("DELETE FROM {$tabla} WHERE idCanciones=?");
       $stm->execute([$id]);
       return $stm->fetch();
     }
