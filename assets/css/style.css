@@ -17,6 +17,7 @@ body {
     /* background-color: var(--mainColor); */
     background: url('../img/pexels-koolshooters-6621701.jpg') var(--mainColor);
     height: 1000px;
+    width: 100%;
     background-size: cover;
     background-attachment: fixed;
 }
@@ -42,3 +43,17 @@ body {
     padding-top: 20%;
     border-color: var(--textColor);
 }
+
+#checkbox1 {
+    width: 20px;
+    height: 20px;
+}
+
+.btn.btn-light {
+    width: 40px;
+}
+
+.btn.btn-outline-light {
+    width: 80px;
+}
+
