@@ -1,5 +1,5 @@
 <?php 
-  require_once "connection.php";
+  require_once "db/connection.php";
 
   function getAll($tabla, $order = false, $orderBy = "")
   {
