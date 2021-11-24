@@ -127,7 +127,6 @@
                     <th>Género</th>
                     <th>País</th>
                     <th>¿Es un cover?</th>
-                    <!-- <th>Favorito</th> -->
                     <th>Usuario</th>
                     <th>Acciones</th>
                 </tr>
@@ -151,10 +150,10 @@
                         <!-- ARTISTAS -->
                         <td>
                             <?php 
-                                $artistas = getAll("artistas INNER JOIN artistas_canciones ON artistas_canciones.idArtistas = artistas.idArtistas WHERE artistas_canciones.idCanciones = " . $cancion['idCanciones']);
+                                $artistas = getAll("artistas INNER JOIN artistas_canciones ON artistas_canciones.idArtistas = artistas.idArtistas INNER JOIN paises ON paises.id = artistas.pais WHERE artistas_canciones.idCanciones = " . $cancion['idCanciones']);
                                 
                                 if(count($artistas) > 0) {
-                                  echo $artistas[0]['nombre'];   
+                                  echo $artistas[0]['nombre'];
                                     if(count($artistas) > 1){
                                         echo ' ft. ';
                                         $colab = "";
@@ -210,30 +209,31 @@
 
                         <!-- GENERO -->
                         <td>
-                            <?php echo $cancion['genero']; ?>
+                            <?php
+                                $genero = getAll("generos INNER JOIN canciones ON canciones.genero = generos.idGeneros WHERE canciones.idCanciones = " . $cancion['idCanciones']);
+                                echo $genero[0]['nombreGenero']; 
+                            ?>
                         </td>
 
                         <!-- NACIONALIDAD -->
                         <td>
-                            <?php 
-                                if(count($artistas) > 0) {
-                                    echo $artistas[0]['nacionalidad'];                          
-                                }
+                            <?php
+                                echo '<img src=https://ipdata.co/flags/' . strtolower($artistas[0]['iso']) . '.png width=30px height=20px> ';
+                                echo $artistas[0]['nombrePais'];
                             ?>
                         </td>
 
                         <!-- COVER -->
                         <td align="center">
-                            <?php 
-                                if($cancion['cover']){ ?> 
-                                    <i class="fas fa-check"></i> 
+                            <?php
+
+                                if($cancion['cover']){ ?>
+                                    <?php $artistaOriginal = getAll("artistas INNER JOIN canciones ON canciones.artistaOriginal = artistas.idArtistas WHERE canciones.idCanciones = " . $cancion['idCanciones'])?>
+                                    <i class="fas fa-check"></i> (<?php echo $artistaOriginal[0]['nombre'] ?>)
                                 <?php    
                                 }
                             ?>
                         </td>
-
-                        <!-- FAVORITO -->
-
 
                         <!-- USUARIO -->
                         <td>
@@ -245,6 +245,8 @@
                                     echo "?";
                                 } else {
                                     echo $usuario[0]['user'];
+                                    if($usuario[0]['favorito'])
+                                        echo ' ❤';
                                 }
                             ?>
                         </td>
