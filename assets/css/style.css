@@ -34,6 +34,40 @@ body {
 /*                   INDEX                     */
 /*---------------------------------------------*/
 
+#login {
+    margin-top: 250px;
+}
+
+#login .container #login-row #login-column #login-box {
+    margin-top: 300px;
+    max-width: 600px;
+    height: 450px;
+    border: 1px solid #9C9C9C;
+    background-color: var(--objectColor);
+    margin: auto;
+  }
+  #login .container #login-row #login-column #login-box #login-form {
+    padding: 40px;
+  }
+  #login .container #login-row #login-column #login-box #login-form #register-link {
+    margin-top: -85px;
+  }
+
+  .btn.btn-outline-secondary {
+    margin-top: 40px;
+    width: 100%;
+  }
+
+  #alerta {
+    max-width: 600px;
+    margin: auto;
+  }
+
+  #usertext {
+      font-size: 20px;
+      color: var(--textColor);
+  }
+
 #header {
     background-color: var(--objectColor);
     text-align: center;

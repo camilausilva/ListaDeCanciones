@@ -1,4 +1,6 @@
 <?php 
+    session_start();
+
     $insert = "";
     $borrar = "";
 
@@ -9,18 +11,24 @@
 
         //Valores por defecto
         $cover = 0;
+        $fav = 0;
         $artistaOriginal = null;
+        
 
         if (isset($_POST["cover"])) {
             $cover = $_POST["cover"];
         	if ($cover) {
-        	$artistaOriginal = $_POST["artistaOriginal"];
+        	    $artistaOriginal = $_POST["artistaOriginal"];
         	}
         }
 
-        // echo $cover;
-        // echo $_POST["artistaOriginal"];
+        if(isset($_POST['fav'])) {
+            $fav = $_POST['fav'];
+        }
 
+        // echo $fav;
+        // echo $_SESSION['id'];
+    
         //INSERT DE LA TABLA canciones
          $insert = insertOrUpdateCanciones(
              $_POST["titulo"], 
@@ -49,6 +57,7 @@
          $insert .= insertOrUpdateTablasIntermedias(
              $cancionCreada[0]["idCanciones"],
              $albumCreado[0]["idAlbumes"],
+             0,
              $_POST["pista"],
              "canciones_albumes"
          );
@@ -56,8 +65,9 @@
         //INSERT DE LA TABLA canciones_usuarios
          $insert .= insertOrUpdateTablasIntermedias(
              $cancionCreada[0]["idCanciones"],
-             2,
-             1,
+             $_SESSION['id'],
+             0,
+             $fav,
              "canciones_usuarios"
          );
 
@@ -77,13 +87,17 @@
      if(isset($_POST["ft"])) {
          //INSERT DE LA TABLA artistas_canciones
          $insert .= insertOrUpdateTablasIntermedias(
-             $_POST["ft"],
-             $_POST["artistas"]
+             $_POST["ft"],      //idCanciones
+             $_POST["artistas"] //idArtistas
          );
      }
 
     //REFRESH
-	$canciones = getAll('canciones');
+	$canciones = getAll('canciones WHERE idCanciones IN (
+                                                SELECT idCanciones
+                                                FROM canciones_usuarios
+                                                WHERE idUsuario = ' . $_SESSION['id'] . 
+                        ')');
 
 ?>
 
@@ -118,20 +132,13 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
-<!-- SELECT PICKER -->
-    <!-- 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/css/bootstrap-select.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/js/bootstrap-select.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> -->
-
 </head>
 
 <body>
 
     <div class="shadow-lg p-3 mb-5" id="header">
         <h2>
-            LISTA DE CANCIONES
+            LISTA DE CANCIONES DE <?php echo $_SESSION["user"] ?>
         </h2>
     </div>
 
@@ -570,9 +577,14 @@
                             &nbsp;
                             <span class="custom-checkbox">
                                 <input type="checkbox" id="inputCover" name="cover" value="1">
-                                <!-- <label for="inputCover"></label> -->
                             </span>
 
+                            <label for="inputFav" class="col-form-label">¡Me gusta!</label>
+                            &nbsp;
+                            &nbsp;
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="inputFav" name="fav" value="1">
+                            </span>
 
                             <select class="form-select" aria-label="Default select example" id="selectArtistaOriginal" name="artistaOriginal">
                                 

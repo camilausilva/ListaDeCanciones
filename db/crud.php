@@ -9,12 +9,12 @@
       if($order)
       {
 
-        $stm = $pdo->prepare("SELECT DISTINCT * FROM {$tabla} ORDER BY {$tabla}.{$orderBy}");
+        $stm = $pdo->prepare("SELECT * FROM {$tabla} ORDER BY {$tabla}.{$orderBy}");
         $stm->execute();
 
       }else
       {
-        $stm = $pdo->prepare("SELECT DISTINCT * FROM {$tabla}");
+        $stm = $pdo->prepare("SELECT * FROM {$tabla}");
         $stm->execute();
       }
 
@@ -127,14 +127,15 @@
     
   }
 
-  function insertOrUpdateTablasIntermedias($idCancion, $idExtra, $pista_fav = null, $nombreTabla = "artistas_canciones", $esUpdate = false) {
+  function insertOrUpdateTablasIntermedias($idCancion, $idExtra, $sinValor = 1, $pista_fav = 0, $nombreTabla = "artistas_canciones", $esUpdate = false) {
 
     $pdo = connect();
+
     try
     {
       $stm = "";
 
-      if ($pista_fav == null){
+      if ($sinValor){
         
         if($esUpdate) {
 
