@@ -1,8 +1,67 @@
 <?php 
+    $insert = "";
     $borrar = "";
 
 	include "db/crud.php";
     $pdo = connect();
+
+    if(isset($_POST["insert"])) {
+
+        //Valores por defecto
+        $cover = 0;
+        $artistaOriginal = null;
+
+        if (isset($_POST["cover"])) {
+            $cover = $_POST["cover"];
+        	if ($cover) {
+        	$artistaOriginal = $_POST["artistaOriginal"];
+        	}
+        }
+
+        // echo $cover;
+        // echo $_POST["artistaOriginal"];
+
+        //INSERT DE LA TABLA canciones
+         $insert = insertOrUpdateCanciones(
+             $_POST["titulo"], 
+             $_POST["duracion"], 
+             $_POST["genero"], 
+             $cover,
+             $artistaOriginal
+         );
+              
+        //INSERT DE LA TABLA albumes
+         $insert .= insertOrUpdateAlbumes(
+             $_POST["album"],
+             $_POST["anio"]
+         );
+        
+        $cancionCreada = getAll("canciones", true, "idCanciones DESC");
+        $albumCreado = getAll("albumes", true, "idAlbumes DESC");
+
+        //INSERT DE LA TABLA artistas_canciones
+         $insert .= insertOrUpdateTablasIntermedias(
+             $cancionCreada[0]["idCanciones"],
+             $_POST["artistas"]
+         );
+
+        //INSERT DE LA TABLA canciones_albumes
+         $insert .= insertOrUpdateTablasIntermedias(
+             $cancionCreada[0]["idCanciones"],
+             $albumCreado[0]["idAlbumes"],
+             $_POST["pista"],
+             "canciones_albumes"
+         );
+        
+        //INSERT DE LA TABLA canciones_usuarios
+         $insert .= insertOrUpdateTablasIntermedias(
+             $cancionCreada[0]["idCanciones"],
+             2,
+             1,
+             "canciones_usuarios"
+         );
+
+    }
 
     if(isset($_POST["delete"])) {
         $borrar = delete('artistas_canciones', $_POST["delete"]);
@@ -11,6 +70,19 @@
         $borrar .= delete('canciones', $_POST["delete"]);
     }
 
+    // foreach($_POST as $post):
+    //     echo $post;
+    // endforeach;
+
+     if(isset($_POST["ft"])) {
+         //INSERT DE LA TABLA artistas_canciones
+         $insert .= insertOrUpdateTablasIntermedias(
+             $_POST["ft"],
+             $_POST["artistas"]
+         );
+     }
+
+    //REFRESH
 	$canciones = getAll('canciones');
 
 ?>
@@ -32,6 +104,9 @@
     <!--CSS-->
     <link href="/ListaDeCanciones/assets/css/style.css" rel="stylesheet" type="text/css">
 
+    <!-- JS -->
+    <script src="assets/js/app.js"></script>
+
     <!--GOOGLE FONTS-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,6 +115,15 @@
     <!--FONT AWESOME-->
     <script src="https://kit.fontawesome.com/5f64a46e85.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/ListaDeCanciones/assets/css/font-awesome-animation.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<!-- SELECT PICKER -->
+    <!-- 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/css/bootstrap-select.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/js/bootstrap-select.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> -->
 
 </head>
 
@@ -106,7 +190,7 @@
                         &nbsp;
                         &nbsp;
 
-                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal" title="Agregar Canción">
                             <i class="fa fa-plus"></i>
                         </button>
 
@@ -158,7 +242,7 @@
                                         echo ' ft. ';
                                         $colab = "";
                                         for($i = 1; $i < count($artistas); $i++){
-                                            $colab .= $artistas[1]['nombre'] . " / ";
+                                            $colab .= $artistas[$i]['nombre'] . " , ";
                                         }
                                         echo substr($colab, 0, -3);
                                     }
@@ -245,8 +329,9 @@
                                     echo "?";
                                 } else {
                                     echo $usuario[0]['user'];
-                                    if($usuario[0]['favorito'])
-                                        echo ' ❤';
+                                    if($usuario[0]['favorito']) {
+                                        ?> <i class="fas fa-heart text-danger"></i> <?php
+                                    }
                                 }
                             ?>
                         </td>
@@ -254,15 +339,22 @@
                     <!-- ACCIONES -->
                     <td>
 
+                        <!-- FEATURING -->
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#ftModal<?php echo $cancion['idCanciones'] ?>" title="Ingresar Featuring">
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+
                         <!-- EDIT -->
-                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal">
-                            <i class="far fa-edit" id="icon"></i> 
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addModal" title="Modificar Canción">
+                            <i class="far fa-edit"></i> 
                         </button>
                         
                         <!-- DELETE -->
-                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $cancion['idCanciones'] ?>">
-                            <i class="far fa-trash-alt" id="icon"></i> 
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $cancion['idCanciones'] ?>"  title="Eliminar Canción">
+                            <i class="far fa-trash-alt"></i> 
                         </button>
+
+
 
                     </td>
 
@@ -286,16 +378,15 @@
 
                                     <div class="modal-footer">
 
-                                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                            No, me arrepiento
-                                        </button>
-
-
                                         <form action="#" method="POST">
                                             <button class="btn btn-primary" data-bs-toggle="modal" value="<?php echo $cancion['idCanciones'] ?>" name="delete"> 
                                                 Sí, deseo eliminarla
                                             </button>                                            
                                         </form>
+
+                                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
+                                            No, me arrepiento
+                                        </button>
 
                                     </div>
 
@@ -305,8 +396,64 @@
                         </div>
 
 
-                        <!-- BORRADO -->
+                        <!------------------------------------------------------------>
+                        <!------------------------- FT MODAL ------------------------->
+                        <!------------------------------------------------------------>
 
+                        <div class="modal fade" id="ftModal<?php echo $cancion['idCanciones'] ?>" aria-hidden="true" aria-labelledby="ftModalLabel<?php echo $cancion['idCanciones'] ?>" tabindex="-1">
+                        
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                
+                                    <form action="#" method="POST">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="ftModalLabel<?php echo $cancion['idCanciones'] ?>">INGRESAR FEATURING</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            
+                                            <label for="inputArtistas" class="col-form-label">Colaboró con:</label>
+                                            <select class="form-select" aria-label="Default select example" id="selectArtistas" name="artistas">
+                                                
+                                                <option value="null" selected>Seleccionar Artista</option>
+
+                                                <?php 
+
+                                                $artistasColaboradores = getAll("artistas
+                                                                        WHERE idArtistas NOT IN (
+                                                                            SELECT idArtistas FROM artistas_canciones
+                                                                            WHERE artistas_canciones.idCanciones = " . $cancion['idCanciones'] . 
+                                                                        ")");
+                                                                        
+                                                foreach($artistasColaboradores as $artistaColaborador): ?>
+
+                                                    <option value="<?php echo $artistaColaborador["idArtistas"] ?>">
+                                                        <?php echo $artistaColaborador["nombre"] ?>
+                                                    </option>
+
+                                                <?php
+                                                endforeach;
+                                                ?>
+                                    
+                                            </select>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                            
+                                                <button class="btn btn-primary" data-bs-toggle="modal" value="<?php echo $cancion['idCanciones'] ?>" name="ft"> 
+                                                    Guardar Cambios
+                                                </button>                                            
+                                            
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
 
 
                 <?php endforeach;?>
@@ -327,114 +474,147 @@
 
     </div>
 
-    <!-- ADD MODAL -->
+
+    <!------------------------------------------------------------->
+    <!------------------------- ADD MODAL ------------------------->
+    <!------------------------------------------------------------->
 
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addModalLabel">ACTUALIZAR DATOS</h5>
+                    <h5 class="modal-title" id="addModalLabel">INGRESAR DATOS</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
-                    <form>
-                    <div class="mb-3">
 
-                        <label for="inputTitulo" class="col-form-label">Título:</label>
-                        <input type="text" class="form-control" id="inputTitulo">
+                    <form action="#" method="POST">
+                        <div class="mb-3">
 
-                        <label for="inputArtista" class="col-form-label">Artista(s):</label>
-                        <select class="form-select" aria-label="Default select example" id="inputArtista">
-                            
-                            <option selected>Artista(s)</option>
+                            <!-- TITULO -->
+                            <label for="inputTitulo" class="col-form-label">Título:</label>
+                            <input type="text" class="form-control" id="inputTitulo" name="titulo">
 
-                            <?php 
+                            <!-- ARTISTAS -->
+                            <label for="inputArtistas" class="col-form-label">Artista(s):</label>
+                            <!-- <input type="text" class="form-control-plaintext" readonly id="inputArtistas"> -->
+                            <select class="form-select" aria-label="Default select example" id="selectArtistas" name="artistas">
+                                
+                                <option value="null" selected>Seleccionar Artista</option>
 
-                            $artistasActuales = getAll("artistas");
+                                <?php 
 
-                            foreach($artistasActuales as $artistaActual): ?>
+                                $artistasActuales = getAll("artistas");
 
-                                <option value="<?php echo $artistaActual["idArtistas"] ?>">
-                                    <?php echo $artistaActual["nombre"] ?>
-                                </option>
+                                foreach($artistasActuales as $artistaActual): ?>
 
-                            <?php
-                            endforeach;
-                            ?>
-                            
-                        </select>
+                                    <option value="<?php echo $artistaActual["idArtistas"] ?>">
+                                        <?php echo $artistaActual["nombre"] ?>
+                                    </option>
+
+                                <?php
+                                endforeach;
+                                ?>
+                                
+                            </select>
+
+                            <label for="inputDuracion" class="col-form-label">Duración:</label>
+                            <input type="text" class="form-control" id="inputDuracion" name="duracion">
+
+                            <label for="inputAlbum" class="col-form-label">Álbum:</label>
+                            <input type="text" class="form-control" id="inputAlbum" name="album">
+
+                            <label for="inputPista" class="col-form-label">Pista:</label>
+                            <input type="number" min="1" class="form-control" id="inputPista" name="pista">
+
+                            <label for="inputAnio" class="col-form-label">Año:</label>
+                            <select class="form-select" aria-label="Default select example" id="inputAnio" name="anio">
+
+                                <option value="null" selected>Seleccionar Año</option>
+
+                                    <?php
+                                    for ($contador = 2022; $contador > 1899; $contador--) { ?>
+                                        <option value="<?php echo $contador ?>">
+                                            <?php echo $contador ?>
+                                        </option>
+                                    <?php
+                                    };
+                                    ?>   
+
+                            </select>
+
+                            <label for="inputGenero" class="col-form-label">Género:</label>
+                                <select class="form-select" aria-label="Default select example" id="inputGenero" name="genero">
+                                    <option value="null" selected>Seleccionar Género</option>
+
+                                        <?php
+                                        $generos = getAll("generos");
+
+                                        foreach($generos as $genero): ?>
+
+                                            <option value="<?php echo $genero["idGeneros"] ?>">
+                                                <?php echo $genero["nombreGenero"] ?>
+                                            </option>
+
+                                        <?php
+                                        endforeach;
+                                        ?>   
+
+                                </select>
 
 
-                        <label for="inputDuracion" class="col-form-label">Duración:</label>
-                        <input type="text" class="form-control" id="inputDuracion">
-
-                        <label for="inputAlbum" class="col-form-label">Álbum:</label>
-                        <textarea class="form-control" id="inputAlbum"></textarea>
-
-                        <label for="inputPista" class="col-form-label">Pista:</label>
-                        <input type="text" class="form-control" id="inputPista">
-
-                        <label for="inputAnio" class="col-form-label">Año:</label>
-                        <input type="text" class="form-control" id="inputAnio">
-
-                        <label for="inputGenero" class="col-form-label">Género:</label>
-                        <select class="form-select" aria-label="Default select example" id="inputGenero">
-                            <option selected>Seleccionar Género</option>
-                            <option value="1">Death Metal Melódico Progresivo</option>
-                            <option value="2">Funk Rock</option>
-                            <option value="3">Groove Metal</option>
-                            <option value="4">Hardcore Melódico</option>
-                            <option value="5">Grunge</option>
-                            <option value="6">Rock Alternativo</option>
-                            <option value="7">Indie Rock</option>
-                            <option value="8">Hardcore Melódico</option>
-                        </select>
-                
+                            <label for="inputCover" class="col-form-label">¿Es un Cover?</label>
+                            &nbsp;
+                            &nbsp;
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="inputCover" name="cover" value="1">
+                                <!-- <label for="inputCover"></label> -->
+                            </span>
 
 
-                        <label for="inputCover" class="col-form-label">¿Es un Cover?</label>
-                        &nbsp;
-                        &nbsp;
-                        <span class="custom-checkbox">
-                            <input type="checkbox" id="inputCover" name="options[]" value="1">
-                            <label for="inputCover"></label>
-                        </span>
+                            <select class="form-select" aria-label="Default select example" id="selectArtistaOriginal" name="artistaOriginal">
+                                
+                                <option value="null" selected>¿Cuál es el/la Artista Original?</option>
 
-                    </div>
+                                <?php 
+
+                                $artistasActuales = getAll("artistas");
+
+                                foreach($artistasActuales as $artistaActual): ?>
+
+                                    <option value="<?php echo $artistaActual["idArtistas"] ?>">
+                                        <?php echo $artistaActual["nombre"] ?>
+                                    </option>
+
+                                <?php
+                                endforeach;
+                                ?>
+                                
+                            </select>
+
+
+
+
+                        </div>
+                    
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" data-bs-toggle="modal" value="0" name="insert">
+                                Guardar Cambios
+                            </button>
+                        </div>
 
                     </form>
+
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
-                </div>
+
 
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="addModal2" aria-hidden="true" aria-labelledby="addModalLabel2" tabindex="-1">
-
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel2">CANCIÓN ELIMINADA</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                Se ha ACTUALIZADO la Lista de Canciones
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-dismiss="modal">Aceptar</button>
-            </div>
-
-        </div>
-    </div>
 
 </div>
 
